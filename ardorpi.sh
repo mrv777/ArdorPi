@@ -183,9 +183,3 @@ if [ $exitCode -ne 0 ]; then
 fi
 
 ls ./deploy
-
-# On another machine, copy generated zip over:
-# scp 'pi@raspberrypi.local:~/pi-gen/deploy/*zip' ~/temp
-#
-# Then run sd-card-write-mac.sh to write that image to SD card for PI use.
-# Finally store / upload image to artifact repository (Nexus, Proget etc.)
