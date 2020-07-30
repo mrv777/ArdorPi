@@ -1,7 +1,12 @@
 # ArdorPi
-Script to make a RaspberryPi Image with Ardor preinstalled
+## RaspberryPi Image with Ardor preinstalled
 
 ![ArdorPi Dashboard](https://github.com/mrv777/ArdorPi/raw/master/ardorPiScreen.png)
+
+[Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)
+Flash using [Etcher](https://www.balena.io/etcher/)
+
+## Build yourself
 
 Tested on Ubuntu 18.04.4 LTS
 
