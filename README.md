@@ -6,6 +6,10 @@
 [Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)
 Flash using [Etcher](https://www.balena.io/etcher/)
 
+### Login
+Username: ardor
+Passwod: pi
+
 ## Build yourself
 
 Tested on Ubuntu 18.04.4 LTS
@@ -14,4 +18,4 @@ Tested on Ubuntu 18.04.4 LTS
 - git clone https://github.com/mrv777/pi-gen.git
 - cd pi-gen
 - wget https://github.com/mrv777/ArdorPi/raw/master/ardorpi.sh
-- echo "pi" | sudo bash ./ardorpi.sh
+- echo "pi" | sudo bash ./ardorpi.sh (You can change **pi** to whatever password you want to set for the user Ardor)
