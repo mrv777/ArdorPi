@@ -6,7 +6,7 @@
 [Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)
 Flash using [Etcher](https://www.balena.io/etcher/)
 
-### Login
+#### Login
 Username: ardor
 Passwod: pi
 
