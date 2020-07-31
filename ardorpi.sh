@@ -152,9 +152,8 @@ sudo chmod 700 /home/ardor/update-nodes.sh
 
 echo "" && echo "[INFO] creating dashboard ..."
 wget https://github.com/mrv777/ArdorPi/raw/master/ardorPiDash.zip
-mv ardorPiDash.zip /var/www/html/
-unzip /var/www/html/ardorPiDash.zip
-rm /var/www/html/ardorPiDash.zip
+unzip ardorPiDash.zip -d /var/www/html
+rm ardorPiDash.zip
 RUN
 
 chmod +x 00-run-chroot.sh
