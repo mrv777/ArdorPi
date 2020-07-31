@@ -5,6 +5,7 @@
 ## RaspberryPi Image with Ardor preinstalled
 - Ardor already installed and bootstrapped
 - Node set as archival and openAPI
+- Starts Ardor up on boot as a service
 - Automatically checks for updates daily and will apply them if found
 - Pretty homepage with links to wallet, test api page, and ardordocs currently
 - Can build the image yourself customizing some settings and getting newest kernel if you wanted
