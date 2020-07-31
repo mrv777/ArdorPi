@@ -4,7 +4,8 @@
 ![ArdorPi Dashboard](https://github.com/mrv777/ArdorPi/raw/master/ardorPiScreen.png)
 
 Download here: [Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)  
-Flash using [Etcher](https://www.balena.io/etcher/)
+Flash using [Etcher](https://www.balena.io/etcher/)  
+Boot Pi and you should be able to access the dashboard with http://{{IP OF PI}}
 
 #### Login
 Username: ardor  
