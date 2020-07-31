@@ -1,8 +1,15 @@
 # ArdorPi
-## RaspberryPi Image with Ardor preinstalled
 
 ![ArdorPi Dashboard](https://github.com/mrv777/ArdorPi/raw/master/ardorPiScreen.png)
 
+## RaspberryPi Image with Ardor preinstalled
+- Ardor already installed and bootstrapped
+- Node set as archival and openAPI
+- Automatically checks for updates daily and will apply them if found
+- Pretty homepage with links to wallet, test api page, and ardordocs currently
+- Can build the image yourself customizing some settings and getting newest kernel if you wanted
+
+### Instructions
 Download here: [Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)  
 Flash using [Etcher](https://www.balena.io/etcher/)  
 Boot Pi and you should be able to access the dashboard with http://{{IP OF PI}}
