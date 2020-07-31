@@ -148,7 +148,7 @@ echo "" && echo "[INFO] creating update script ..."
 wget https://raw.githubusercontent.com/mrv777/ArdorPi/master/update-nodes.sh
 mv update-nodes.sh /home/ardor/
 sudo chmod 700 /home/ardor/update-nodes.sh
-(sudo crontab -l 2>> /dev/null; echo "0 2 * * *  /bin/bash /home/ardor/update-nodes.sh >/dev/null 2>&1") | sudo crontab -
+(crontab -l ; echo "0 2 * * *  /bin/bash /home/ardor/update-nodes.sh >/dev/null 2>&1") | crontab -
 
 echo "" && echo "[INFO] creating dashboard ..."
 wget https://github.com/mrv777/ArdorPi/raw/master/ardorPiDash.zip
