@@ -12,7 +12,7 @@
 ### Instructions
 Download here: [Prebuild Image](https://ardor.tools/ardor-raspbian-lite.zip)  
 Flash using [Etcher](https://www.balena.io/etcher/)  
-Boot Pi and you should be able to access the dashboard with http://{{IP OF PI}}
+Boot Pi and you should be able to access the dashboard with http://{{IP of RaspberryPi}}
 
 #### Login
 Username: ardor  
