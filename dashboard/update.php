@@ -89,7 +89,7 @@
            </div>
            <script src="assets/js/jquery-3.5.1.min.js"></script>
            <script>
-            let url = window.location.protocol + "//" + window.location.hostname + "/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi";
+            let url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi";
             //let url = "https://node7.ardor.tools/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi";
             $.getJSON(url, function(result){
               if (result['aliasURI']) {

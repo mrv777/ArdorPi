@@ -113,25 +113,34 @@ WantedBy=multi-user.target
 NGINX_FILE_CONTENT="
 server {
     listen 80 default_server;
-    server_name _;
+    listen [::]:80 default_server;
 
     root /var/www/html;
 
-    index index.html index.htm index.php;
+    index index.html index.htm index.php index.nginx-debian.html;
 
-    charset utf-8;
+    server_name _;
+
     location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
         try_files $uri $uri/ =404;
     }
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-    access_log off;
-
+    # pass PHP scripts to FastCGI server
+    #
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
+
+        # With php-fpm (or other unix sockets):
         fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+    #   # With php-cgi (or other tcp sockets):
+    #   fastcgi_pass 127.0.0.1:9000;
     }
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
     location ~ /\.ht {
         deny all;
     }
