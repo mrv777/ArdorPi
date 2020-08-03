@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>D-Chat v0.0.2</title>
+<style> 
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+  background-color: #0e436d;
+}
+
+.box { 
+  padding: 1em;
+}
+
+input {
+  width: 100%;
+  padding: 1em;
+  outline: none;
+  border: 1px solid #f2f2f2;
+}
+input[type="text"]:disabled {
+  color: white;
+}
+
+.message-list {
+  margin: 0;
+  padding: 0;
+}
+
+.message-list li {
+  padding: .2em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  background-color: #f2f2f2;
+}
+
+.app-layout {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: auto 1fr auto;
+}
+
+.header     { background-color: #ffffff; }
+.teams      { background-color: #0e436d; text-align: center; color: #fff;}
+.channels   { background-color: #1263a2; color: #ccc;}
+.messages   { background-color: #ffffff; color: #333;}
+.write      { background-color: #f2f2f2; }
+.login		{ background-color: #0e436d; margin: auto; }
+
+.teams {
+  font-size: 80%;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.channels {
+  grid-column: 1;
+  grid-row: 2 / 3;
+}
+
+.header {
+  grid-column: 2;
+  grid-row: 1;
+  border-bottom: 1px solid #999;
+  color: #999;
+}
+#channel_name {
+  font-weight: bold;
+  font-size:120%;
+  color:#000;
+}
+#channel_address {
+	font-size: 100%;
+	margin-left: 0.3em;
+	color: #aaa;
+}
+.channel_info {
+	font-size: 90%;
+	padding-left: 1em;
+	padding-top:0.2em;
+}
+
+.messages {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 0 1em;
+  overflow-y: scroll;
+}
+
+.input {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+a.channel {
+	color: #aaa;
+	text-decoration: none;
+	text-align: left;
+}
+a.channel:hover {
+	color:#fff;
+}
+.channels-list {
+	list-style-type: none;
+	padding-left: 0.1em;
+	margin-top: 0;
+}
+.channels-list li {
+	margin: 0.5em 0 0.5em 0.2em;
+	list-style-type: none;
+	font-size: 0.75em;
+}
+div.message {
+	padding: 1em 0.2em;
+	
+}
+div.message_body {
+	padding-top: 0.3em;
+	padding-left: 0.4em ;
+}
+span.sender {
+	font-weight: bold;
+}
+span.datatime {
+	font-size: 80%;
+	color: #aaa;
+}
+.account_note {
+	font-weight: normal;
+	font-size: 90%;
+	color: #999;
+}
+a.selected_channel {
+	font-weight: bold;
+	color: #FFF;
+}
+#current_login_account {
+	margin:0.3em 0.3em;
+	margin-bottom: 0.5em;
+	color: #ccc;
+}
+#current_login_name {
+	font-size: 120%;
+}
+#select_node {
+	width: 90%;
+}
+.app_info {
+	font-size: 75%;
+	border: 1px solid #aaa;
+	padding: 0.5em;
+	margin-top: 1.5em;
+}
+
+#logout {
+	background-color: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.fromSelf {
+	text-align: right;
+}
+
+#chatHeading {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+.unconfirmed {
+	font-style: italic;
+}
+#addContact {
+	float:right;
+	border: 1px solid;
+	padding: 0.1em 0.4em;
+	border-radius: 0.2em;
+	color: #aaa;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class='app-layout'>
+    <div class='teams box'>
+			<div id='current_login_name'>Not Logged in</div>
+			<div id='current_login_account'></div>
+			<div id='current_login_balance'></div>
+	</div>
+  <div class='channels box'>
+  	<h3><a class="channel" id="ARDOR-Q9KZ-74XD-WERK-CV6GB" data-channel-name="public" href="#" >Public Chat</a></h3>
+  	<a id="addContact" href="#" onclick="_add_chat()">+</a>
+  	<span id="chatHeading">Chats</span>
+    <ul id='private_chats' class='channels-list'>
+    </ul>
+	  <div class="app_info">
+			Chat using your Ardor node.
+			Only works in Chrome and Firefox.
+	  </div>
+	</div>
+	<div id='login_box' class='login box'>
+		<input type="password" style="text-align:left;margin-top:8px;height:1em;" id="text_passphrase" placeholder='Input Passphrase here to Login.'></input>
+	</div>
+    <div class='header box'><span id='channel_name'># public</span> <div id='channel_info'>Permanent public chat</div></div>
+    <div class='messages box' style=''>
+			<div class='message'>
+				<div class='message_header'><span class='sender'></span><span class='datatime'></span></div>
+				<div class='message_body'>No messages.</div>
+			</div>
+    </div>
+    <div class='input box'>
+      <input type='text' value='< - Login to send message.' id='_message' disabled='disabled' maxlength="500" >
+    </div>
+  </div>
+  
+  </body>
+  <script src="../assets/js/jquery-3.5.1.min.js"></script>
+	<script src="ardorjs.js"></script>
+  <script>
+		var MAX_MESSAGES = 100;
+		var FEE_IGNIS = 0.03;
+		var REFRESH_TIME = 20;
+		
+		//var _node_url = "https://testnode7.ardor.tools/nxt";
+		let _node_url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt";
+
+		var _current_login_account;
+		var _passphrase;
+		
+		var _current_channel_address = "ARDOR-Q9KZ-74XD-WERK-CV6GB";
+		var _current_channel_name = "public";
+	
+		function _login() {
+				_current_login_account = ardorjs.secretPhraseToAccountId(_passphrase);
+			  $.ajax({url: _node_url, data: {'requestType': 'getBalance', 'chain': 2, 'account': _current_login_account }, 
+				success: function(data) {
+
+					$("#current_login_account").text(_current_login_account);
+					$("#current_login_balance").text("Ignis: "+$.parseJSON(data)["balanceNQT"]/100000000);
+					$("#_message").val("");
+					$("#_message").attr("placeholder", "Send message as " + _current_login_account + " for 0.3 IGNIS");
+					if ($.parseJSON(data)["balanceNQT"]/100000000 > 0.03) {
+						$("#_message").prop('disabled', false);
+					} else {
+						$("#_message").val("Not enough IGNIS to send in Public Chat");
+					}
+					
+					$.ajax({url: _node_url, data: {'requestType': 'getAccount', 'account': _current_login_account }, 
+							success: function(data) {
+								var name = $.parseJSON(data)["name"];	
+								if (name && name.length > 0) {
+									$('#current_login_name').text(name);
+									$("#_message").attr("placeholder", "Send message as " + name + ' (' + _current_login_account + ') for 0.3 IGNIS');
+								} else {
+									$('#current_login_name').text("No name set");
+								}
+						}
+					});	
+					$('#login_box').html('<button type="button" id="logout" onclick="_logout()">Logout</button>');
+					if(localStorage){ localStorage.setItem("dChat_passphrase", _passphrase); }
+					$("#private_chats").append('<li><a class="channel" id="ARDOR-ZGRW-4AKA-NKS8-GP52V" data-channel-name="ARDOR-ZGRW-4AKA-NKS8-GP52V" href="#" >ARDOR-ZGRW-4AKA-NKS8-GP52V</a></li>'); //Add a private message example
+					show_messages(); //Reload messages so can correctly set styles on own msgs
+				},
+				error: function() {
+					alert('error login');
+				}
+			});
+		}
+
+		function _logout () {
+        localStorage.removeItem("dChat_passphrase");
+        location.reload();
+    }
+		
+		$("#text_passphrase").change(function() {
+			_passphrase = this.value;
+			if(_passphrase)
+				_login();
+		});
+			
+		function _load_sender_name(account) {				
+				$.ajax({url: _node_url, data: {'requestType': 'getAccount', 'account': account }, 
+					success: function(data) {
+						var name = $.parseJSON(data)["name"];	
+						if (name && name.length > 0) {
+							localStorage.setItem(account, name);
+						}
+				}
+				});				
+		}
+
+		function show_messages() {
+			  $.ajax({url: _node_url, data: {'requestType': 'getPrunableMessages', 'chain': 2, 'account': _current_channel_address, 'lastIndex': MAX_MESSAGES }, 
+				success: function(data) {
+					var mgs = $.parseJSON(data)["prunableMessages"];
+					$("div.messages").empty();
+					if (mgs.length>0) {
+						for(var i=mgs.length-1;i>=0;i--){
+							if(mgs[i]['isText'] && mgs[i]['message']) {
+								var date = new Date(mgs[i]['transactionTimestamp']*1000 + Date.UTC(2018));
+								let msgClass = (mgs[i]['senderRS'] == _current_login_account) ? "fromSelf"  : "";
+								var _message = "<div class='message "+msgClass+"' id='" + mgs[i]['transactionFullHash'] + "'><div class='message_header'><span class='sender' onclick='_load_sender_name(\"" + mgs[i]['senderRS'] + "\")'>" + mgs[i]['senderRS'] + "</span><span class='datatime'> " + date.toLocaleString() + "</span></div><div class='message_body'>" + "</div></div>";
+								$("div.messages").append(_message);
+								$("#"+ mgs[i]['transactionFullHash'] +' .message_body').text(mgs[i]['message']);
+								if (localStorage.getItem(mgs[i]['senderRS'])) {
+									$('#'+mgs[i]['transactionFullHash']+" span.sender").text(localStorage.getItem(mgs[i]['senderRS']));
+								}
+							}
+						}
+					} else {
+						$("div.messages").html("<div class='message'><div class='message_header'><span class='sender'></span><span class='datatime'></span></div><div class='message_body'>No messages.</div></div>");
+					}
+
+					$("#channel_name").text('# ' + _current_channel_name);
+					if (_current_channel_name == "public") {
+						$("#channel_info").text('Permanent public chat');
+					} else {
+						// Load public key of recipient, if doesn't have one don't enable
+						$("#channel_info").text('Private chat');
+					}
+
+					
+					$("a.channel").removeClass('selected_channel');
+					$("#"+_current_channel_address).addClass('selected_channel');
+					$("div.messages").animate({scrollTop: $("div.messages").prop("scrollHeight") }, 10);
+				},
+				error: function() {
+					alert('error fecthing messages');
+				}
+			});
+		
+		}
+
+		function _add_chat() {
+			let contact = prompt("Enter person's account");
+			if (contact != null && contact.length > 20 && contact.length < 28) {
+			  $("#private_chats").append('<li><a class="channel" id="'+contact+'" data-channel-name="'+contact+'" href="#">'+contact+'</a></li>');
+			} else {
+				alert("Invalid account");
+			}
+		}
+
+		function _send_private_message(msg) {
+      let encrypted_msg = ardorjs.encryptMessage(msg, _passphrase, recipient_Pubkey, false);
+		}
+		
+		function _send_message(msg) {
+			  $.ajax({url: _node_url, data: {'requestType': 'sendMessage', 'chain': 2, 'recipient': _current_channel_address, 
+											 'secretPhrase': _passphrase, 'feeNQT': FEE_IGNIS*100000000,
+											 'message': msg, 'messageIsText': true, 'messageIsPrunable': true
+											 }, type: 'POST',
+				success: function(data) {
+						var rtn_msg = $.parseJSON(data);
+						if(rtn_msg['errorDescription']) {
+							alert('Error sending message: ' + rtn_msg['errorDescription']);
+						} else {
+							if(rtn_msg["transactionJSON"]) {
+								$('#_message').val("");
+								$("#_message").attr("placeholder", "Message Sent at " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + ". Message will be confirmed in about 60 seconds (block time).");
+
+								let _temp_message = "<div class='message fromSelf unconfirmed' id='" + rtn_msg["transactionJSON"]['transactionFullHash'] + "'><div class='message_header'><span class='sender'>" + _current_login_account + "</span><span class='datatime'> " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + "</span></div><div class='message_body'>" + msg + "</div></div>";
+								$("div.messages").append(_temp_message);
+							}
+						}						
+				},
+				error: function() {
+					alert('error sending messages');
+				}
+			});		
+		}
+		
+		$(document).on('click','a.channel', function(){
+			$("a.channel").removeClass('selected_channel');
+			_current_channel_address = this.getAttribute("id");
+			_current_channel_name = this.getAttribute("data-channel-name");
+			show_messages();	
+			$(this).addClass('selected_channel');
+		});
+		
+		$("#_message").keypress(function(e) {
+			if(e.which == 13) {
+				var msg = $(this).val();
+				if( msg.length > 0 && _passphrase) {
+					_send_message(msg);
+				}
+			}
+		});
+		
+		$( document ).ready(function() {
+				if (localStorage.getItem("dChat_passphrase")) {
+            _passphrase = localStorage.getItem("dChat_passphrase");
+						$("#text_passphrase").val(_passphrase);
+						_login();
+          }
+				
+				show_messages();
+				setInterval(show_messages, REFRESH_TIME*1000);				
+		});		
+  </script>
+</html>

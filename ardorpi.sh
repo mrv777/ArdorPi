@@ -65,7 +65,7 @@ if [ -d "$step" ]; then rm -Rf $step; fi
 mkdir $step && pushd $step
 
 cat > 00-packages <<RUN
-nginx unzip curl openjdk-8-jre jq
+nginx unzip curl openjdk-8-jre jq php-fpm
 RUN
 
 popd
@@ -108,6 +108,34 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+"
+
+NGINX_FILE_CONTENT="
+server {
+    listen 80 default_server;
+    server_name _;
+
+    root /var/www/html;
+
+    index index.html index.htm index.php;
+
+    charset utf-8;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+    access_log off;
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+    }
+    location ~ /\.ht {
+        deny all;
+    }
+}
 "
 
 
@@ -155,6 +183,8 @@ wget https://github.com/mrv777/ArdorPi/raw/master/ardorPiDash.zip
 unzip ardorPiDash.zip -d /var/www/html
 chown www-data:ardor /var/www/html -R
 rm ardorPiDash.zip
+mv /etc/nginx/sites-available/default /home/ardor/nginxBackup
+echo "${NGINX_FILE_CONTENT}" | sudo tee /etc/nginx/sites-available/default > /dev/null
 RUN
 
 chmod +x 00-run-chroot.sh

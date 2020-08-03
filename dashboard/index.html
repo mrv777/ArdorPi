@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>ArdorPi</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main">
+						<header>
+							<span class="avatar"><img src="images/ardorPi.png" alt="ArdorPi Logo" /></span>
+							<h1>ArdorPi</h1>
+							<p>Your personal Ardor node</p>
+						</header>
+						<footer>
+							<ul class="icons">
+								<li><a href=":27876/index.html" class="icon solid fa-laptop" title="Local Ardor Node">Local Ardor Node</a></li>
+								<li><a href="dchat/index.html" class="icon solid fa-comments" title="d-chat">d-chat</a></li>
+								<li><a href=":27876/test" class="icon solid fa-laptop-code" title="Local Node API Page">Local Node API Page</a></li>
+								<li><a href="https://ardordocs.jelurida.com/" class="icon solid fa-book" title="Ardor Documentation">Ardor Documentation</a></li>
+								<li><a href="update.php" class="icon solid fa-upload" title="Update ArdorPi">Update ArdorPi</a></li>
+							</ul>
+						</footer>
+					</section>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="copyright">
+							<li>&copy; <a href="https://squirrelsystems.net">Squirrel Systems LLC</a> | v0.1.0</li>
+						</ul>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script>
+				if ('addEventListener' in window) {
+					window.addEventListener('load', function() { document.body.className = document.body.className.replace(/\bis-preload\b/, ''); });
+					document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
+				}
+			</script>
+			<script>
+				document.addEventListener('click', function(event) {
+				  var target = event.target;
+				  if (target.tagName.toLowerCase() == 'a')
+				  {
+				      var port = target.getAttribute('href').match(/^:(\d+)(.*)/);
+				      if (port)
+				      {
+				         target.href = port[2];
+				         target.port = port[1];
+				      }
+				  }
+				}, false);
+			</script>
+
+	</body>
+</html>
