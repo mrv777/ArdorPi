@@ -110,43 +110,6 @@ Restart=always
 WantedBy=multi-user.target
 "
 
-NGINX_FILE_CONTENT="
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-
-    index index.html index.htm index.php index.nginx-debian.html;
-
-    server_name _;
-
-    location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-        try_files \$uri \$uri/ =404;
-    }
-
-    # pass PHP scripts to FastCGI server
-    #
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-
-        # With php-fpm (or other unix sockets):
-        fastcgi_pass unix:/run/php/php7.3-fpm.sock;
-    #   # With php-cgi (or other tcp sockets):
-    #   fastcgi_pass 127.0.0.1:9000;
-    }
-
-    # deny access to .htaccess files, if Apache's document root
-    # concurs with nginx's one
-    #
-    location ~ /\.ht {
-        deny all;
-    }
-}
-"
-
 
 cat > 00-run-chroot.sh <<RUN
 #!/bin/bash
@@ -193,7 +156,42 @@ unzip ardorPiDash.zip -d /var/www/html
 chown www-data:ardor /var/www/html -R
 rm ardorPiDash.zip
 mv /etc/nginx/sites-available/default /home/ardor/nginxBackup
-echo "${NGINX_FILE_CONTENT}" | sudo tee /etc/nginx/sites-available/default > /dev/null
+echo "
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+
+    index index.html index.htm index.php index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files \$uri \$uri/ =404;
+    }
+
+    # pass PHP scripts to FastCGI server
+    #
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+
+        # With php-fpm (or other unix sockets):
+        fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+    #   # With php-cgi (or other tcp sockets):
+    #   fastcgi_pass 127.0.0.1:9000;
+    }
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    location ~ /\.ht {
+        deny all;
+    }
+}
+" | sudo tee /etc/nginx/sites-available/default > /dev/null
 RUN
 
 chmod +x 00-run-chroot.sh
