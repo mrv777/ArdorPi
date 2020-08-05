@@ -235,8 +235,8 @@ a.selected_channel {
 		var FEE_IGNIS = 0.03;
 		var REFRESH_TIME = 20;
 		
-		//var _node_url = "https://testnode7.ardor.tools/nxt";
-		let _node_url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt";
+		var _node_url = "https://testnode7.ardor.tools/nxt";
+		//let _node_url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt";
 
 		var _current_login_account;
 		var _passphrase;
@@ -304,44 +304,60 @@ a.selected_channel {
 		}
 
 		function show_messages() {
+			if (_current_channel_name == "public") {
 			  $.ajax({url: _node_url, data: {'requestType': 'getPrunableMessages', 'chain': 2, 'account': _current_channel_address, 'lastIndex': MAX_MESSAGES }, 
-				success: function(data) {
-					var mgs = $.parseJSON(data)["prunableMessages"];
-					$("div.messages").empty();
-					if (mgs.length>0) {
-						for(var i=mgs.length-1;i>=0;i--){
-							if(mgs[i]['isText'] && mgs[i]['message']) {
-								var date = new Date(mgs[i]['transactionTimestamp']*1000 + Date.UTC(2018));
-								let msgClass = (mgs[i]['senderRS'] == _current_login_account) ? "fromSelf"  : "";
-								var _message = "<div class='message "+msgClass+"' id='" + mgs[i]['transactionFullHash'] + "'><div class='message_header'><span class='sender' onclick='_load_sender_name(\"" + mgs[i]['senderRS'] + "\")'>" + mgs[i]['senderRS'] + "</span><span class='datatime'> " + date.toLocaleString() + "</span></div><div class='message_body'>" + "</div></div>";
-								$("div.messages").append(_message);
-								$("#"+ mgs[i]['transactionFullHash'] +' .message_body').text(mgs[i]['message']);
-								if (localStorage.getItem(mgs[i]['senderRS'])) {
-									$('#'+mgs[i]['transactionFullHash']+" span.sender").text(localStorage.getItem(mgs[i]['senderRS']));
+					success: function(data) {
+						var mgs = $.parseJSON(data)["prunableMessages"];
+						$("div.messages").empty();
+						if (mgs.length>0) {
+							for(var i=mgs.length-1;i>=0;i--){
+								if(mgs[i]['isText'] && mgs[i]['message']) {
+									var date = new Date(mgs[i]['transactionTimestamp']*1000 + Date.UTC(2018));
+									let msgClass = (mgs[i]['senderRS'] == _current_login_account) ? "fromSelf"  : "";
+									var _message = "<div class='message "+msgClass+"' id='" + mgs[i]['transactionFullHash'] + "'><div class='message_header'><span class='sender' onclick='_load_sender_name(\"" + mgs[i]['senderRS'] + "\")'>" + mgs[i]['senderRS'] + "</span><span class='datatime'> " + date.toLocaleString() + "</span></div><div class='message_body'>" + "</div></div>";
+									$("div.messages").append(_message);
+									$("#"+ mgs[i]['transactionFullHash'] +' .message_body').text(mgs[i]['message']);
+									if (localStorage.getItem(mgs[i]['senderRS'])) {
+										$('#'+mgs[i]['transactionFullHash']+" span.sender").text(localStorage.getItem(mgs[i]['senderRS']));
+									}
 								}
 							}
+						} else {
+							$("div.messages").html("<div class='message'><div class='message_header'><span class='sender'></span><span class='datatime'></span></div><div class='message_body'>No messages.</div></div>");
 						}
-					} else {
-						$("div.messages").html("<div class='message'><div class='message_header'><span class='sender'></span><span class='datatime'></span></div><div class='message_body'>No messages.</div></div>");
+					},
+					error: function() {
+						alert('error fecthing messages');
 					}
-
-					$("#channel_name").text('# ' + _current_channel_name);
-					if (_current_channel_name == "public") {
-						$("#channel_info").text('Permanent public chat');
-					} else {
-						// Load public key of recipient, if doesn't have one don't enable
-						$("#channel_info").text('Private chat');
+				});
+			} else {
+				$.ajax({url: _node_url, data: {'requestType': 'getUnconfirmedTransactions', 'chain': 2, 'account': _current_channel_address, 'account': _current_login_account, 'lastIndex': MAX_MESSAGES }, 
+					success: function(data) {
+						let utxs = $.parseJSON(data)["unconfirmedTransactions"];
+						$("div.messages").empty();
+						if (utxs.length>0) {
+							for(var i=utxs.length-1;i>=0;i--){
+								if(utxs[i]['attachment'] && utxs[i]['attachment']['encryptedMessage']) {
+									let date = new Date(utxs[i]['timestamp']*1000 + Date.UTC(2018));
+									let msgClass = (utxs[i]['senderRS'] == _current_login_account) ? "fromSelf"  : "";
+									let _message = "<div class='message "+msgClass+"' id='" + utxs[i]['fullHash'] + "'><div class='message_header'><span class='sender' onclick='_load_sender_name(\"" + utxs[i]['senderRS'] + "\")'>" + utxs[i]['senderRS'] + "</span><span class='datatime'> " + date.toLocaleString() + "</span></div><div class='message_body'>" + "</div></div>";
+									$("div.messages").append(_message);
+									let decryptedMsg = ardorjs.decryptNote(utxs[i]['attachment']['encryptedMessage']['data'],utxs[i]['attachment']['encryptedMessage'],_passphrase);
+									$("#"+ utxs[i]['fullHash'] +' .message_body').text(decryptedMsg['message']);
+									if (localStorage.getItem(utxs[i]['senderRS'])) {
+										$('#'+utxs[i]['fullHash']+" span.sender").text(localStorage.getItem(utxs[i]['senderRS']));
+									}
+								}
+							}
+						} else {
+							$("div.messages").html("<div class='message'><div class='message_header'><span class='sender'></span><span class='datatime'></span></div><div class='message_body'>No messages.</div></div>");
+						}
+					},
+					error: function() {
+						alert('error fecthing messages');
 					}
-
-					
-					$("a.channel").removeClass('selected_channel');
-					$("#"+_current_channel_address).addClass('selected_channel');
-					$("div.messages").animate({scrollTop: $("div.messages").prop("scrollHeight") }, 10);
-				},
-				error: function() {
-					alert('error fecthing messages');
-				}
-			});
+				});
+			}
 		
 		}
 
@@ -355,7 +371,39 @@ a.selected_channel {
 		}
 
 		function _send_private_message(msg) {
-      let encrypted_msg = ardorjs.encryptMessage(msg, _passphrase, recipient_Pubkey, false);
+			$.ajax({url: _node_url, data: {'requestType': 'getAccountPublicKey', 'account': _current_channel_address, 
+											 }, type: 'GET',
+				success: function(dataPkey) {
+					let resturn_data = $.parseJSON(dataPkey);
+					let recipient_Pubkey = resturn_data['publicKey'];
+		      let encrypted_msg = ardorjs.encryptMessage(msg, _passphrase, recipient_Pubkey, false);
+		      $.ajax({url: _node_url, data: {'requestType': 'sendMessage', 'chain': 2, 'recipient': _current_channel_address, 
+													 'secretPhrase': _passphrase, 'feeNQT': 0,
+													 'encryptedMessageData': encrypted_msg['encryptedMessageData'], 'encryptedMessageNonce': encrypted_msg['encryptedMessageNonce'], 'messageIsText': true, 'messageIsPrunable': true
+													 }, type: 'POST',
+						success: function(data) {
+								var rtn_msg = $.parseJSON(data);
+								if(rtn_msg['errorDescription']) {
+									alert('Error sending message: ' + rtn_msg['errorDescription']);
+								} else {
+									if(rtn_msg["transactionJSON"]) {
+										$('#_message').val("");
+										$("#_message").attr("placeholder", "Message Sent at " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + ". Message will be confirmed in about 60 seconds (block time).");
+
+										let _temp_message = "<div class='message fromSelf unconfirmed' id='" + rtn_msg["transactionJSON"]['transactionFullHash'] + "'><div class='message_header'><span class='sender'>" + _current_login_account + "</span><span class='datatime'> " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + "</span></div><div class='message_body'>" + msg + "</div></div>";
+										$("div.messages").append(_temp_message);
+									}
+								}						
+						},
+						error: function() {
+							alert('error sending messages');
+						}
+					});
+				},
+				error: function() {
+					alert('error sending messages');
+				}
+			});
 		}
 		
 		function _send_message(msg) {
@@ -388,14 +436,28 @@ a.selected_channel {
 			_current_channel_address = this.getAttribute("id");
 			_current_channel_name = this.getAttribute("data-channel-name");
 			show_messages();	
+
 			$(this).addClass('selected_channel');
+			$("#channel_name").text('# ' + _current_channel_name);
+			if (_current_channel_name == "public") {
+				$("#channel_info").text('Permanent public chat');
+			} else {
+				// Load public key of recipient, if doesn't have one don't enable
+				$("#channel_info").text('Private chat');
+			}
+
+			$("div.messages").animate({scrollTop: $("div.messages").prop("scrollHeight") }, 10);
 		});
 		
 		$("#_message").keypress(function(e) {
 			if(e.which == 13) {
 				var msg = $(this).val();
 				if( msg.length > 0 && _passphrase) {
-					_send_message(msg);
+					if (_current_channel_name == "public") {
+						_send_message(msg);
+					} else {
+						_send_private_message(msg);
+					}
 				}
 			}
 		});
