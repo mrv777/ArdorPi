@@ -110,9 +110,9 @@ Restart=always
 WantedBy=multi-user.target
 "
 
-
 cat > 00-run-chroot.sh <<RUN
 #!/bin/bash
+uri='\$uri'
 echo "Download and prepare Ardor"
 wget https://www.jelurida.com/ardor-client.zip -q --show-progress
 unzip -qq ardor-client.zip
