@@ -78,6 +78,9 @@ input[type="text"]:disabled {
   font-size:120%;
   color:#000;
 }
+#help_info {
+	float: right;
+}
 #channel_address {
 	font-size: 100%;
 	margin-left: 0.3em;
@@ -215,7 +218,11 @@ a.selected_channel {
 	<div id='login_box' class='login box'>
 		<input type="password" style="text-align:left;margin-top:8px;height:1em;" id="text_passphrase" placeholder='Input Passphrase here to Login.'></input>
 	</div>
-    <div class='header box'><span id='channel_name'># public</span> <div id='channel_info'>Permanent public chat</div></div>
+    <div class='header box'>
+    	<a href="#" onclick="_get_help()" id="help_info" title="Help">?</a>
+    	<span id='channel_name'># public</span> 
+    	<div id='channel_info'>Permanent public chat</div>
+    </div>
     <div class='messages box' style=''>
 			<div class='message'>
 				<div class='message_header'><span class='sender'></span><span class='datatime'></span></div>
@@ -388,7 +395,7 @@ a.selected_channel {
 								} else {
 									if(rtn_msg["transactionJSON"]) {
 										$('#_message').val("");
-										$("#_message").attr("placeholder", "Message Sent at " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + ". Message will be confirmed in about 60 seconds (block time).");
+										$("#_message").attr("placeholder", "Message Sent at " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + ".");
 
 										let _temp_message = "<div class='message fromSelf unconfirmed' id='" + rtn_msg["transactionJSON"]['transactionFullHash'] + "'><div class='message_header'><span class='sender'>" + _current_login_account + "</span><span class='datatime'> " + (new Date(rtn_msg["transactionJSON"]['timestamp']*1000 + Date.UTC(2018))).toTimeString().split(' ')[0] + "</span></div><div class='message_body'>" + msg + "</div></div>";
 										$("div.messages").append(_temp_message);
@@ -429,6 +436,10 @@ a.selected_channel {
 					alert('error sending messages');
 				}
 			});		
+		}
+
+		function _get_help() {
+			alert("Welcome to dChat.  Your decentralized chat using the Ardor platform.  Messages in the Public Chat cost IGNIS, are unencrypted, and seen by all.  Private chats are encrypted so only receiver and sender can view, and delete from the blockchain after 15 minutes.  Clicking any account will attempt to load its name.");
 		}
 		
 		$(document).on('click','a.channel', function(){

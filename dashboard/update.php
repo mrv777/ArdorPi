@@ -1,7 +1,25 @@
- <?php  
+<?php  
+
+$alias=file_get_contents("http://localhost:27876/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi");
+$alias_obj = json_decode($alias);
+$alias_array = explode("|",$alias_obj->aliasURI);
 
  if (isset($_GET["update"])) {
 
+  //$update_file=file_get_contents("http://localhost:27876/nxt?requestType=downloadTaggedData&chain=2&transactionFullHash=".$alias_array[1]);
+  $f = file_put_contents("update.zip", fopen("http://localhost:27876/nxt?requestType=downloadTaggedData&chain=2&transactionFullHash=".$alias_array[1], 'r'), LOCK_EX);
+  if(FALSE === $f)
+      die("Couldn't write to file.");
+  $zip = new ZipArchive;
+  $res = $zip->open('update.zip');
+  if ($res === TRUE) {
+    $zip->extractTo('.');
+    $zip->close();
+    $output = "Updated";
+    header("Location: update.php");
+  } else {
+    $output = "Error";
+  }
  }
  else if(isset($_POST["btn_zip"]))  
  {  
@@ -69,8 +87,8 @@
            <br />  
            <div class="container" style="width:500px;">  
                 <h1>Update ArdorPi</h1>
-                <p>Current Version: <span id="current">0.1.0</span></p>
-                <p>Latest Version: <span id="latest"></span></p>
+                <p>Current Version: <span id="current">0.1.1</span></p>
+                <p>Latest Version: <span id="latest"><?=$alias_array[0] ?></span> <a href="#" onclick="alert('Changelog:\r\n<?=$alias_array[2] ?>')">?</a></p>
                 <a class="btn large"  href="update.php?update">Update</a>
 
                 <form method="post" enctype="multipart/form-data">  
@@ -89,19 +107,11 @@
            </div>
            <script src="assets/js/jquery-3.5.1.min.js"></script>
            <script>
-            let url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi";
-            //let url = "https://node7.ardor.tools/nxt?requestType=getAlias&chain=2&aliasName=ArdorPi";
-            $.getJSON(url, function(result){
-              if (result['aliasURI']) {
-                let ardorPiInfo = result['aliasURI'].split("|");
-                $("#latest").text(ardorPiInfo[0]);
-                if ($("#latest").text() == $("#current").text()) {
-                  $("#current").css("color", "green");
-                } else {
-                  $("#current").css("color", "red");
-                }
+              if ($("#latest").text() == $("#current").text()) {
+                $("#current").css("color", "green");
+              } else {
+                $("#current").css("color", "red");
               }
-            });
             </script>
       </body>  
- </html>  
+ </html>
