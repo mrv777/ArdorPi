@@ -120,7 +120,7 @@ a.channel:hover {
 .channels-list li {
 	margin: 0.5em 0 0.5em 0.2em;
 	list-style-type: none;
-	font-size: 0.75em;
+	font-size: 0.71em;
 }
 div.message {
 	padding: 1em 0.2em;
@@ -187,7 +187,7 @@ a.selected_channel {
 .unconfirmed {
 	font-style: italic;
 }
-#addContact {
+#addContact, #removeContact {
 	float:right;
 	border: 1px solid;
 	padding: 0.1em 0.4em;
@@ -242,8 +242,8 @@ a.selected_channel {
 		var FEE_IGNIS = 0.03;
 		var REFRESH_TIME = 20;
 		
-		var _node_url = "https://testnode7.ardor.tools/nxt";
-		//let _node_url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt";
+		//var _node_url = "https://testnode7.ardor.tools/nxt";
+		let _node_url = window.location.protocol + "//" + window.location.hostname + ":27876/nxt";
 
 		var _current_login_account;
 		var _passphrase;
@@ -278,14 +278,27 @@ a.selected_channel {
 						}
 					});	
 					$('#login_box').html('<button type="button" id="logout" onclick="_logout()">Logout</button>');
-					if(localStorage){ localStorage.setItem("dChat_passphrase", _passphrase); }
-					$("#private_chats").append('<li><a class="channel" id="ARDOR-ZGRW-4AKA-NKS8-GP52V" data-channel-name="ARDOR-ZGRW-4AKA-NKS8-GP52V" href="#" >ARDOR-ZGRW-4AKA-NKS8-GP52V</a></li>'); //Add a private message example
+					if(localStorage){ 
+						localStorage.setItem("dChat_passphrase", _passphrase);
+						_load_contacts();
+					}
 					show_messages(); //Reload messages so can correctly set styles on own msgs
 				},
 				error: function() {
 					alert('error login');
 				}
 			});
+		}
+
+		function _load_contacts() {
+			let contacts = localStorage.getItem(_current_login_account+"_contacts");
+			if (contacts) {
+				$("#private_chats").text('');
+				let contacts_array = contacts.split('|');
+				for(let i=0;i<contacts_array.length-1;i++){
+					$("#private_chats").append('<li><a class="channel" id="'+contacts_array[i]+'" data-channel-name="'+contacts_array[i]+'" href="#" >'+contacts_array[i]+'</a><a id="removeContact" href="#" onclick="_remove_chat(\''+contacts_array[i]+'\')">-</a></li>');
+				}
+			}
 		}
 
 		function _logout () {
@@ -305,6 +318,9 @@ a.selected_channel {
 						var name = $.parseJSON(data)["name"];	
 						if (name && name.length > 0) {
 							localStorage.setItem(account, name);
+							$(".sender").text(function () {
+							    return $(this).text().replace(account, name); 
+							});
 						}
 				}
 				});				
@@ -371,9 +387,27 @@ a.selected_channel {
 		function _add_chat() {
 			let contact = prompt("Enter person's account");
 			if (contact != null && contact.length > 20 && contact.length < 28) {
-			  $("#private_chats").append('<li><a class="channel" id="'+contact+'" data-channel-name="'+contact+'" href="#">'+contact+'</a></li>');
+			  $("#private_chats").append('<li><a class="channel" id="'+contact+'" data-channel-name="'+contact+'" href="#">'+contact+'</a><a id="removeContact" href="#" onclick="_remove_chat(\''+contact+'\')">-</a></li>');
+			  if (localStorage.getItem(_current_login_account+"_contacts")) {
+          let contacts = localStorage.getItem(_current_login_account+"_contacts");
+          contacts += contact+"|";
+          localStorage.setItem(_current_login_account+"_contacts", contacts);
+        } else {
+        	localStorage.setItem(_current_login_account+"_contacts", contact+"|");
+        }
 			} else {
 				alert("Invalid account");
+			}
+		}
+
+		function _remove_chat(account) {
+			let contacts = localStorage.getItem(_current_login_account+"_contacts");
+			if (contacts != null && contacts.length > 20) {
+			 contacts = contacts.replace(account+"|",'');
+			 localStorage.setItem(_current_login_account+"_contacts", contacts);
+			 _load_contacts();
+			} else {
+				alert("No Contacts");
 			}
 		}
 
@@ -441,6 +475,10 @@ a.selected_channel {
 		function _get_help() {
 			alert("Welcome to dChat.  Your decentralized chat using the Ardor platform.  Messages in the Public Chat cost IGNIS, are unencrypted, and seen by all.  Private chats are encrypted so only receiver and sender can view, and delete from the blockchain after 15 minutes.  Clicking any account will attempt to load its name.");
 		}
+
+		function _ping_account() {
+
+		}
 		
 		$(document).on('click','a.channel', function(){
 			$("a.channel").removeClass('selected_channel');
@@ -455,6 +493,7 @@ a.selected_channel {
 			} else {
 				// Load public key of recipient, if doesn't have one don't enable
 				$("#channel_info").text('Private chat with 15 minute burning messages');
+				_ping_account();
 			}
 
 			$("div.messages").animate({scrollTop: $("div.messages").prop("scrollHeight") }, 10);
