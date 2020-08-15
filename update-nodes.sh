@@ -29,6 +29,7 @@ if [ -z ${REMOTE_VERSION} ] || [ -z ${LOCAL_VERSION} ]; then
 fi
 
 if [ ${REMOTE_VERSION} != ${LOCAL_VERSION} ]; then
+  cd /home/ardor
 
   echo "[INFO] downloading new ardor release ..."
   wget https://www.jelurida.com/ardor-client.zip -q --show-progress
